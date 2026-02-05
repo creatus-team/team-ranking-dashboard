@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>크리투스 팀 랭킹 대시보드</title>
+  <title>1주 1릴스 챌린지 팀 대항전 점수</title>
   <style>
     :root {
       --bg: #ffffff;
@@ -14,7 +15,11 @@
       --bar-height: 44px;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -24,15 +29,23 @@
       padding: 20px;
     }
 
-    .container { max-width: 720px; margin: 0 auto; }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
 
     /* 헤더 */
-    .header { text-align: center; padding: 32px 0 8px; }
+    .header {
+      text-align: center;
+      padding: 32px 0 8px;
+    }
+
     .header h1 {
       font-size: 1.7rem;
       font-weight: 800;
       color: var(--text);
     }
+
     .header .subtitle {
       color: var(--text-muted);
       font-size: 0.85rem;
@@ -47,23 +60,42 @@
     }
 
     /* 로딩 */
-    .loading { text-align: center; padding: 60px 0; color: var(--text-muted); }
+    .loading {
+      text-align: center;
+      padding: 60px 0;
+      color: var(--text-muted);
+    }
+
     .loading .spinner {
-      width: 36px; height: 36px;
+      width: 36px;
+      height: 36px;
       border: 3px solid var(--border);
       border-top-color: #1B4F9B;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin: 0 auto 14px;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
     /* 에러 */
     .error {
-      text-align: center; padding: 40px 20px;
-      background: var(--card-bg); border-radius: 12px; color: #dc3545;
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      color: #dc3545;
     }
-    .error p { margin-top: 8px; color: var(--text-muted); font-size: 0.85rem; }
+
+    .error p {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
 
     /* 1등 하이라이트 */
     .top-team {
@@ -74,13 +106,27 @@
       margin-bottom: 28px;
       border: 1px solid var(--border);
     }
-    .top-team .crown { font-size: 2.2rem; margin-bottom: 4px; }
-    .top-team .team-name { font-size: 1.8rem; font-weight: 800; }
-    .top-team .team-score {
-      font-size: 1rem; color: var(--text-muted); margin-top: 2px;
+
+    .top-team .crown {
+      font-size: 2.2rem;
+      margin-bottom: 4px;
     }
+
+    .top-team .team-name {
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    .top-team .team-score {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
     .top-team .team-score span {
-      color: #1B4F9B; font-weight: 800; font-size: 1.3rem;
+      color: #1B4F9B;
+      font-weight: 800;
+      font-size: 1.3rem;
     }
 
     /* 바 차트 */
@@ -91,52 +137,85 @@
       margin-bottom: 20px;
       border: 1px solid var(--border);
     }
+
     .chart-section h2 {
-      font-size: 1rem; font-weight: 700;
-      margin-bottom: 18px; color: var(--text);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      color: var(--text);
     }
 
     .bar-row {
-      display: flex; align-items: center;
-      margin-bottom: 12px; gap: 10px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 10px;
     }
 
     .bar-rank {
-      width: 24px; font-size: 0.8rem; font-weight: 700;
-      color: var(--text-muted); text-align: center; flex-shrink: 0;
+      width: 24px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-align: center;
+      flex-shrink: 0;
     }
-    .bar-rank.first { color: #D4A017; }
-    .bar-rank.second { color: #8a8a8a; }
-    .bar-rank.third { color: #A0622E; }
+
+    .bar-rank.first {
+      color: #D4A017;
+    }
+
+    .bar-rank.second {
+      color: #8a8a8a;
+    }
+
+    .bar-rank.third {
+      color: #A0622E;
+    }
 
     .bar-label {
-      width: 38px; font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+      width: 38px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
     }
 
     .bar-track {
-      flex: 1; background: #eef0f4; border-radius: 8px;
-      height: var(--bar-height); overflow: hidden;
+      flex: 1;
+      background: #eef0f4;
+      border-radius: 8px;
+      height: var(--bar-height);
+      overflow: hidden;
     }
 
     .bar-fill {
-      height: 100%; border-radius: 8px;
-      display: flex; align-items: center; justify-content: flex-end;
+      height: 100%;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
       padding-right: 12px;
-      font-weight: 700; font-size: 0.85rem; color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #fff;
       transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
       min-width: fit-content;
     }
 
     .bar-fill.narrow {
       justify-content: flex-start;
-      padding-left: 8px; padding-right: 0;
+      padding-left: 8px;
+      padding-right: 0;
       color: var(--text);
     }
 
     .bar-score-outside {
-      margin-left: 8px; font-weight: 700;
-      font-size: 0.85rem; color: var(--text);
-      flex-shrink: 0; min-width: 50px;
+      margin-left: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text);
+      flex-shrink: 0;
+      min-width: 50px;
     }
 
     /* 순위표 */
@@ -147,71 +226,145 @@
       margin-bottom: 24px;
       border: 1px solid var(--border);
     }
+
     .table-section h2 {
-      font-size: 1rem; font-weight: 700; margin-bottom: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 14px;
     }
 
-    .rank-table { width: 100%; border-collapse: collapse; }
+    .rank-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
 
     .rank-table thead th {
-      text-align: left; padding: 10px 12px;
-      font-size: 0.7rem; text-transform: uppercase;
-      letter-spacing: 0.05em; color: var(--text-muted);
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
       border-bottom: 1px solid var(--border);
     }
+
     .rank-table thead th:last-child,
     .rank-table thead th:nth-child(3),
-    .rank-table thead th:nth-child(4) { text-align: right; }
+    .rank-table thead th:nth-child(4) {
+      text-align: right;
+    }
 
     .rank-table tbody td {
-      padding: 13px 12px; font-size: 0.9rem;
+      padding: 13px 12px;
+      font-size: 0.9rem;
       border-bottom: 1px solid #f0f1f4;
     }
-    .rank-table tbody tr:last-child td { border-bottom: none; }
+
+    .rank-table tbody tr:last-child td {
+      border-bottom: none;
+    }
 
     .rank-table tbody td:last-child,
     .rank-table tbody td:nth-child(3),
-    .rank-table tbody td:nth-child(4) { text-align: right; }
-
-    .rank-table .rank-num { font-weight: 700; width: 40px; }
-    .rank-table .team-cell { font-weight: 700; }
-    .rank-table .team-dot {
-      display: inline-block; width: 10px; height: 10px;
-      border-radius: 50%; margin-right: 8px; vertical-align: middle;
+    .rank-table tbody td:nth-child(4) {
+      text-align: right;
     }
-    .rank-table .score-cell { font-weight: 700; font-size: 1rem; }
-    .rank-table .bonus-cell { color: var(--text-muted); font-size: 0.82rem; }
+
+    .rank-table .rank-num {
+      font-weight: 700;
+      width: 40px;
+    }
+
+    .rank-table .team-cell {
+      font-weight: 700;
+    }
+
+    .rank-table .team-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .rank-table .score-cell {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .rank-table .bonus-cell {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
     .rank-table .bonus-badge {
-      display: inline-block; background: #e8f0fe; color: #1B4F9B;
-      font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; font-weight: 600;
+      display: inline-block;
+      background: #e8f0fe;
+      color: #1B4F9B;
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
     }
 
     /* 푸터 */
     .footer {
-      text-align: center; padding: 16px 0 32px;
-      color: var(--text-muted); font-size: 0.72rem;
+      text-align: center;
+      padding: 16px 0 32px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
     }
 
     /* 반응형 */
     @media (max-width: 480px) {
-      body { padding: 12px; }
-      .header h1 { font-size: 1.4rem; }
-      .top-team { padding: 20px 16px; }
-      .top-team .crown { font-size: 1.8rem; }
-      .top-team .team-name { font-size: 1.5rem; }
-      .chart-section, .table-section { padding: 16px; }
-      :root { --bar-height: 36px; }
-      .bar-label { width: 32px; font-size: 0.82rem; }
+      body {
+        padding: 12px;
+      }
+
+      .header h1 {
+        font-size: 1.4rem;
+      }
+
+      .top-team {
+        padding: 20px 16px;
+      }
+
+      .top-team .crown {
+        font-size: 1.8rem;
+      }
+
+      .top-team .team-name {
+        font-size: 1.5rem;
+      }
+
+      .chart-section,
+      .table-section {
+        padding: 16px;
+      }
+
+      :root {
+        --bar-height: 36px;
+      }
+
+      .bar-label {
+        width: 32px;
+        font-size: 0.82rem;
+      }
+
       .rank-table thead th,
-      .rank-table tbody td { padding: 10px 8px; font-size: 0.82rem; }
+      .rank-table tbody td {
+        padding: 10px 8px;
+        font-size: 0.82rem;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
-      <h1>크리투스 팀 랭킹</h1>
-      <div class="subtitle">1 릴스 챌린지 게이미피케이션</div>
+      <h1>1주 1릴스 챌린지 팀 대항전 점수</h1>
     </div>
     <div class="update-info" id="updateInfo"></div>
     <div id="app">
@@ -220,7 +373,7 @@
         <div>데이터를 불러오는 중...</div>
       </div>
     </div>
-    <div class="footer">크리투스 소그룹 운영 대시보드</div>
+    <div class="footer"></div>
   </div>
 
   <script>
@@ -373,4 +526,5 @@
     setInterval(loadData, 5 * 60 * 1000);
   </script>
 </body>
+
 </html>
