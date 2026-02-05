@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>크리투스 팀 랭킹 대시보드</title>
+  <style>
+    :root {
+      --team-A: #FF6B6B;
+      --team-B: #4ECDC4;
+      --team-C: #45B7D1;
+      --team-D: #96CEB4;
+      --team-E: #FFEAA7;
+      --team-F: #DDA0DD;
+      --bg: #0f0f1a;
+      --card-bg: #1a1a2e;
+      --text: #e0e0e0;
+      --text-muted: #888;
+      --accent: #6c63ff;
+      --bar-height: 48px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* 헤더 */
+    .header {
+      text-align: center;
+      padding: 32px 0 24px;
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #6c63ff, #4ECDC4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .header .subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .update-info {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-bottom: 24px;
+    }
+
+    /* 로딩 */
+    .loading {
+      text-align: center;
+      padding: 60px 0;
+      color: var(--text-muted);
+    }
+
+    .loading .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--card-bg);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 에러 */
+    .error {
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      color: #FF6B6B;
+    }
+
+    .error p {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* 1등 하이라이트 */
+    .top-team {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+      margin-bottom: 24px;
+      border: 1px solid rgba(108, 99, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .top-team::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #6c63ff, #4ECDC4, #FFD93D);
+    }
+
+    .top-team .crown {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+    }
+
+    .top-team .team-name {
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .top-team .team-score {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .top-team .team-score span {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.4rem;
+    }
+
+    /* 바 차트 */
+    .chart-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .chart-section h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 12px;
+    }
+
+    .bar-rank {
+      width: 28px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .bar-rank.first { color: #FFD93D; }
+    .bar-rank.second { color: #C0C0C0; }
+    .bar-rank.third { color: #CD7F32; }
+
+    .bar-label {
+      width: 40px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .bar-track {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      height: var(--bar-height);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: rgba(0, 0, 0, 0.7);
+      transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+      min-width: fit-content;
+    }
+
+    .bar-fill.narrow {
+      justify-content: flex-start;
+      padding-left: 8px;
+      padding-right: 0;
+      color: var(--text);
+    }
+
+    .bar-score-outside {
+      margin-left: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text);
+      flex-shrink: 0;
+      min-width: 50px;
+    }
+
+    /* 순위표 */
+    .table-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .table-section h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .rank-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .rank-table thead th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .rank-table thead th:last-child,
+    .rank-table thead th:nth-child(3),
+    .rank-table thead th:nth-child(4) {
+      text-align: right;
+    }
+
+    .rank-table tbody td {
+      padding: 14px 12px;
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .rank-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .rank-table tbody td:last-child,
+    .rank-table tbody td:nth-child(3),
+    .rank-table tbody td:nth-child(4) {
+      text-align: right;
+    }
+
+    .rank-table .rank-num {
+      font-weight: 700;
+      width: 40px;
+    }
+
+    .rank-table .team-cell {
+      font-weight: 700;
+    }
+
+    .rank-table .team-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .rank-table .score-cell {
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .rank-table .bonus-cell {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .rank-table .bonus-badge {
+      display: inline-block;
+      background: rgba(108, 99, 255, 0.15);
+      color: var(--accent);
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* 푸터 */
+    .footer {
+      text-align: center;
+      padding: 16px 0 32px;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    /* 반응형 */
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+      }
+
+      .header h1 {
+        font-size: 1.4rem;
+      }
+
+      .top-team {
+        padding: 20px 16px;
+      }
+
+      .top-team .crown {
+        font-size: 2rem;
+      }
+
+      .top-team .team-name {
+        font-size: 1.6rem;
+      }
+
+      .chart-section, .table-section {
+        padding: 16px;
+      }
+
+      :root {
+        --bar-height: 38px;
+      }
+
+      .bar-label {
+        width: 32px;
+        font-size: 0.85rem;
+      }
+
+      .rank-table thead th,
+      .rank-table tbody td {
+        padding: 10px 8px;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>크리투스 팀 랭킹</h1>
+      <div class="subtitle">1 릴스 챌린지 게이미피케이션</div>
+    </div>
+    <div class="update-info" id="updateInfo"></div>
+    <div id="app">
+      <div class="loading">
+        <div class="spinner"></div>
+        <div>데이터를 불러오는 중...</div>
+      </div>
+    </div>
+    <div class="footer">
+      크리투스 소그룹 운영 대시보드
+    </div>
+  </div>
+
+  <script>
+    // === 설정 ===
+    const SHEET_ID = '1dKyjPmmqtkPbkPv_ByEgQM6i3JNK2hhQ6Ej9nrQbLJw';
+    const SHEET_NAME = '점수 집계';
+    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+
+    const TEAM_COLORS = {
+      'A': 'var(--team-A)',
+      'B': 'var(--team-B)',
+      'C': 'var(--team-C)',
+      'D': 'var(--team-D)',
+      'E': 'var(--team-E)',
+      'F': 'var(--team-F)',
+    };
+
+    // === CSV 파싱 ===
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      if (lines.length < 2) return [];
+
+      return lines.slice(1).map(line => {
+        // Google Sheets CSV는 값을 큰따옴표로 감쌈
+        const cells = [];
+        let current = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+              current += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (ch === ',' && !inQuotes) {
+            cells.push(current.trim());
+            current = '';
+          } else {
+            current += ch;
+          }
+        }
+        cells.push(current.trim());
+
+        return {
+          team: cells[0] || '',
+          members: parseInt(cells[1]) || 0,
+          w1: parseInt(cells[2]) || 0,
+          w2: parseInt(cells[3]) || 0,
+          w3: parseInt(cells[4]) || 0,
+          w4: parseInt(cells[5]) || 0,
+          personalTotal: parseFloat(cells[6]) || 0,
+          bonusTotal: parseInt(cells[7]) || 0,
+          total: parseFloat(cells[8]) || 0,
+        };
+      }).filter(row => row.team);
+    }
+
+    // === 렌더링 ===
+    function render(teams) {
+      const sorted = [...teams].sort((a, b) => b.total - a.total);
+      const maxScore = sorted[0]?.total || 1;
+      const top = sorted[0];
+
+      const app = document.getElementById('app');
+
+      // 1등 하이라이트
+      let html = '';
+      if (top && top.total > 0) {
+        html += `
+          <div class="top-team">
+            <div class="crown">👑</div>
+            <div class="team-name" style="color: ${TEAM_COLORS[top.team] || '#fff'}">${top.team}팀</div>
+            <div class="team-score"><span>${Math.round(top.total).toLocaleString()}</span>점</div>
+          </div>
+        `;
+      }
+
+      // 바 차트
+      html += `<div class="chart-section"><h2>팀별 점수</h2>`;
+      sorted.forEach((t, i) => {
+        const pct = maxScore > 0 ? (t.total / maxScore) * 100 : 0;
+        const isNarrow = pct < 15;
+        const rankClass = i === 0 ? 'first' : i === 1 ? 'second' : i === 2 ? 'third' : '';
+        const rankLabel = `${i + 1}`;
+
+        html += `
+          <div class="bar-row">
+            <div class="bar-rank ${rankClass}">${rankLabel}</div>
+            <div class="bar-label" style="color: ${TEAM_COLORS[t.team] || '#fff'}">${t.team}팀</div>
+            <div class="bar-track">
+              <div class="bar-fill ${isNarrow ? 'narrow' : ''}" style="width: ${Math.max(pct, 2)}%; background: ${TEAM_COLORS[t.team] || '#888'};">
+                ${!isNarrow ? Math.round(t.total).toLocaleString() : ''}
+              </div>
+            </div>
+            ${isNarrow ? `<div class="bar-score-outside">${Math.round(t.total).toLocaleString()}</div>` : ''}
+          </div>
+        `;
+      });
+      html += `</div>`;
+
+      // 순위표
+      html += `
+        <div class="table-section">
+          <h2>상세 순위</h2>
+          <table class="rank-table">
+            <thead>
+              <tr>
+                <th>순위</th>
+                <th>팀</th>
+                <th>개인 점수</th>
+                <th>보너스</th>
+                <th>총점</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      sorted.forEach((t, i) => {
+        const bonusBadges = t.bonusTotal > 0
+          ? `${Math.round(t.bonusTotal).toLocaleString()} <span class="bonus-badge">+${t.bonusTotal / 100}회</span>`
+          : '0';
+
+        html += `
+          <tr>
+            <td class="rank-num">${i + 1}</td>
+            <td class="team-cell">
+              <span class="team-dot" style="background: ${TEAM_COLORS[t.team] || '#888'}"></span>
+              ${t.team}팀
+            </td>
+            <td>${Math.round(t.personalTotal).toLocaleString()}</td>
+            <td class="bonus-cell">${bonusBadges}</td>
+            <td class="score-cell">${Math.round(t.total).toLocaleString()}</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table></div>`;
+
+      app.innerHTML = html;
+
+      // 바 애니메이션: 초기에 width 0으로 설정 후 트리거
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.bar-fill').forEach(bar => {
+          const targetWidth = bar.style.width;
+          bar.style.width = '0%';
+          requestAnimationFrame(() => {
+            bar.style.width = targetWidth;
+          });
+        });
+      });
+
+      // 업데이트 시간
+      const now = new Date();
+      document.getElementById('updateInfo').textContent =
+        `마지막 업데이트: ${now.toLocaleDateString('ko-KR')} ${now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
+    function showError(msg) {
+      document.getElementById('app').innerHTML = `
+        <div class="error">
+          <strong>데이터를 불러올 수 없습니다</strong>
+          <p>${msg}</p>
+        </div>
+      `;
+    }
+
+    // === 데이터 로드 ===
+    async function loadData() {
+      try {
+        const res = await fetch(CSV_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        const teams = parseCSV(text);
+        if (teams.length === 0) throw new Error('데이터가 비어 있습니다');
+        render(teams);
+      } catch (err) {
+        console.error('데이터 로드 실패:', err);
+        showError('스프레드시트의 "웹에 게시" 설정을 확인해주세요.');
+      }
+    }
+
+    // 초기 로드
+    loadData();
+
+    // 5분마다 자동 새로고침
+    setInterval(loadData, 5 * 60 * 1000);
+  </script>
+</body>
+</html>
