@@ -416,7 +416,7 @@
           bonusTotal: parseInt(cells[6]) || 0,
           total: parseFloat(cells[7]) || 0,
         };
-      }).filter(row => row.team);
+      }).filter(row => ['A', 'B', 'C', 'D', 'E', 'F'].includes(row.team));
     }
 
     function render(teams) {
