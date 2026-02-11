@@ -414,10 +414,10 @@
         return {
           team: cells[0] || '', members: parseInt(cells[1]) || 0,
           w1: parseInt(cells[2]) || 0, w2: parseInt(cells[3]) || 0,
-          w3: parseInt(cells[4]) || 0, w4: parseInt(cells[5]) || 0,
-          personalTotal: parseFloat(cells[6]) || 0,
-          bonusTotal: parseInt(cells[7]) || 0,
-          total: parseFloat(cells[8]) || 0,
+          w3: parseInt(cells[4]) || 0,
+          personalTotal: parseFloat(cells[5]) || 0,
+          bonusTotal: parseInt(cells[6]) || 0,
+          total: parseFloat(cells[7]) || 0,
         };
       }).filter(row => row.team);
     }
