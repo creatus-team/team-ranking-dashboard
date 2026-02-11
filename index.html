@@ -567,6 +567,40 @@
       });
 
       html += `</tbody></table></div>`;
+
+      // 주차별 제출 현황
+      const weeks = [
+        { key: 'w1', label: '1주차' },
+        { key: 'w2', label: '2주차' },
+        { key: 'w3', label: '3주차' },
+      ].filter(w => sorted.some(t => t[w.key] > 0));
+
+      if (weeks.length > 0) {
+        html += `
+          <div class="table-section">
+            <h2>주차별 제출 현황</h2>
+            <table class="rank-table"><thead><tr>
+              <th>팀</th>${weeks.map(w => `<th>${w.label}</th>`).join('')}
+            </tr></thead><tbody>`;
+
+        sorted.forEach((t, i) => {
+          const dotColor = getRankColor(i, teamCount);
+          html += `
+            <tr>
+              <td class="team-cell">
+                <span class="team-dot" style="background: ${dotColor}"></span>${t.team}팀
+              </td>
+              ${weeks.map(w => {
+                const count = t[w.key];
+                const full = count >= t.members;
+                return `<td style="text-align:right;${full ? 'color:#1B4F9B;font-weight:700' : ''}">${count}/${t.members}</td>`;
+              }).join('')}
+            </tr>`;
+        });
+
+        html += `</tbody></table></div>`;
+      }
+
       app.innerHTML = html;
 
       // 바 애니메이션
