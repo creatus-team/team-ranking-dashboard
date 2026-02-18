@@ -248,10 +248,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .rank-table thead th:last-child,
-    .rank-table thead th:nth-child(3),
-    .rank-table thead th:nth-child(4),
-    .rank-table thead th:nth-child(5) {
+    .rank-table thead th:nth-child(n+3) {
       text-align: right;
     }
 
@@ -265,10 +262,7 @@
       border-bottom: none;
     }
 
-    .rank-table tbody td:last-child,
-    .rank-table tbody td:nth-child(3),
-    .rank-table tbody td:nth-child(4),
-    .rank-table tbody td:nth-child(5) {
+    .rank-table tbody td:nth-child(n+3) {
       text-align: right;
     }
 
@@ -362,6 +356,142 @@
       line-height: 1.45;
     }
 
+    /* 개인별 제출 현황 */
+    .personal-status-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+    }
+
+    .personal-status-section h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .week-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .week-tab {
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .week-tab:hover {
+      border-color: #1B4F9B;
+      color: #1B4F9B;
+    }
+
+    .week-tab.active {
+      background: #1B4F9B;
+      color: #fff;
+      border-color: #1B4F9B;
+    }
+
+    .team-accordion {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .team-accordion-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      cursor: pointer;
+      background: #fff;
+      transition: background 0.2s;
+      user-select: none;
+    }
+
+    .team-accordion-header:hover {
+      background: #f0f2f6;
+    }
+
+    .team-accordion-header .team-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .team-accordion-header .team-info .arrow {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    .team-accordion-header .team-info .arrow.open {
+      transform: rotate(90deg);
+    }
+
+    .team-accordion-header .team-count {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .team-accordion-header .full-badge {
+      display: inline-block;
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-size: 0.68rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .team-accordion-body {
+      display: none;
+      padding: 4px 16px 14px;
+      background: #fff;
+    }
+
+    .team-accordion-body.open {
+      display: block;
+    }
+
+    .member-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 6px;
+    }
+
+    .member-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.82rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .member-item.submitted {
+      color: #1B4F9B;
+      background: #e8f0fe;
+    }
+
+    .member-item.missing {
+      color: #c62828;
+      background: #fce4ec;
+    }
+
     /* 푸터 */
     .footer {
       text-align: center;
@@ -411,6 +541,19 @@
         padding: 10px 8px;
         font-size: 0.82rem;
       }
+
+      .personal-status-section {
+        padding: 16px;
+      }
+
+      .member-grid {
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+      }
+
+      .member-item {
+        font-size: 0.76rem;
+        padding: 3px 6px;
+      }
     }
   </style>
 </head>
@@ -418,8 +561,7 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>크리투스 팀 랭킹</h1>
-      <div class="subtitle">1 릴스 챌린지 게이미피케이션</div>
+      <h1>1주 1릴스 챌린지 팀 대항전</h1>
     </div>
     <div class="update-info" id="updateInfo"></div>
     <div id="app">
@@ -451,6 +593,13 @@
           <div class="scoring-desc">한 주에 팀원 모두가 제출하면 보너스가 붙습니다. 가장 큰 점수원!</div>
         </div>
       </div>
+      <div class="scoring-item">
+        <div class="scoring-icon" style="background: #fff3e0;">💬</div>
+        <div class="scoring-content">
+          <div class="scoring-title">피드백을 주고받으면, 보너스 100점!</div>
+          <div class="scoring-desc">팀 피드백을 완료하면 주차당 100점 보너스가 추가됩니다.</div>
+        </div>
+      </div>
     </div>
     <div class="footer">크리투스 소그룹 운영 대시보드</div>
   </div>
@@ -459,6 +608,8 @@
     const SHEET_ID = '1dKyjPmmqtkPbkPv_ByEgQM6i3JNK2hhQ6Ej9nrQbLJw';
     const SHEET_NAME = '점수 집계';
     const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+    const MEMBER_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent('소그룹 데이터 가져오기')}`;
+    const SUBMIT_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent('과제 폼 가져오기')}`;
 
     // 순위 기반 색상: 1등(진한 파랑) → 꼴등(빨강)
     function getRankColor(rank, total) {
@@ -471,22 +622,31 @@
       return `hsl(${h}, ${s}%, ${l}%)`;
     }
 
+    function parseCSVLine(line) {
+      const cells = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+          else { inQuotes = !inQuotes; }
+        } else if (ch === ',' && !inQuotes) { cells.push(current.trim()); current = ''; }
+        else { current += ch; }
+      }
+      cells.push(current.trim());
+      return cells;
+    }
+
+    function normalizeName(name) {
+      return (name || '').trim().replace(/\(.*?\)/g, '').replace(/\s+/g, '').normalize('NFC');
+    }
+
     function parseCSV(text) {
       const lines = text.trim().split('\n');
       if (lines.length < 2) return [];
       return lines.slice(1).map(line => {
-        const cells = [];
-        let current = '';
-        let inQuotes = false;
-        for (let i = 0; i < line.length; i++) {
-          const ch = line[i];
-          if (ch === '"') {
-            if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
-            else { inQuotes = !inQuotes; }
-          } else if (ch === ',' && !inQuotes) { cells.push(current.trim()); current = ''; }
-          else { current += ch; }
-        }
-        cells.push(current.trim());
+        const cells = parseCSVLine(line);
         return {
           team: cells[0] || '', members: parseInt(cells[1]) || 0,
           w1: parseInt(cells[2]) || 0, w2: parseInt(cells[3]) || 0,
@@ -494,11 +654,85 @@
           personalTotal: parseFloat(cells[5]) || 0,
           bonusTotal: parseInt(cells[6]) || 0,
           total: parseFloat(cells[7]) || 0,
+          fb1: cells[8] === 'TRUE' ? 1 : 0,
+          fb2: cells[9] === 'TRUE' ? 1 : 0,
+          fb3: cells[10] === 'TRUE' ? 1 : 0,
+          fbBonus: parseInt(cells[11]) || 0,
         };
-      }).filter(row => row.team);
+      }).filter(row => row.team && row.members > 0);
     }
 
-    function render(teams) {
+    function parseMemberCSV(text) {
+      const lines = text.trim().split('\n');
+      if (lines.length < 2) return [];
+      return lines.slice(1).map(line => {
+        const cells = parseCSVLine(line);
+        const name = normalizeName(cells[0]);
+        const team = (cells[1] || '').trim();
+        return { name, team };
+      }).filter(row => row.name && row.team);
+    }
+
+    function parseSubmitCSV(text) {
+      const lines = text.trim().split('\n');
+      if (lines.length < 2) return [];
+      return lines.slice(1).map(line => {
+        const cells = parseCSVLine(line);
+        const name = normalizeName(cells[2]);
+        const team = (cells[4] || '').trim();
+        const weekRaw = (cells[5] || '');
+        const weekMatch = weekRaw.match(/(\d+)주차/);
+        const week = weekMatch ? parseInt(weekMatch[1]) : 0;
+        return { name, team, week };
+      }).filter(row => row.name && row.week > 0);
+    }
+
+    function buildSubmissionStatus(members, submissions) {
+      // 팀별 전체 인원 맵 구축
+      const teamMembers = {};
+      members.forEach(m => {
+        if (!teamMembers[m.team]) teamMembers[m.team] = new Set();
+        teamMembers[m.team].add(m.name);
+      });
+
+      // 주차별 + 팀별 제출자 Set 구축
+      const weekTeamSubmitted = {}; // { week: { team: Set<name> } }
+      const allWeeks = new Set();
+      submissions.forEach(s => {
+        allWeeks.add(s.week);
+        if (!weekTeamSubmitted[s.week]) weekTeamSubmitted[s.week] = {};
+        if (!weekTeamSubmitted[s.week][s.team]) weekTeamSubmitted[s.week][s.team] = new Set();
+        weekTeamSubmitted[s.week][s.team].add(s.name);
+      });
+
+      const weeks = [...allWeeks].sort((a, b) => a - b);
+
+      // 이름 매칭 안정성 확인: 미매칭 이름 콘솔 경고
+      submissions.forEach(s => {
+        const memberSet = teamMembers[s.team];
+        if (memberSet && !memberSet.has(s.name)) {
+          console.warn(`[이름 미매칭] 제출자 "${s.name}" (팀: ${s.team})가 소그룹 명단에 없음`);
+        }
+      });
+
+      // 팀별 상태 구축
+      const teamStatus = {};
+      for (const [team, memberSet] of Object.entries(teamMembers)) {
+        const memberList = [...memberSet].sort();
+        const weekStatus = {};
+        weeks.forEach(w => {
+          const submitted = weekTeamSubmitted[w]?.[team] || new Set();
+          const submittedList = memberList.filter(n => submitted.has(n));
+          const missingList = memberList.filter(n => !submitted.has(n));
+          weekStatus[w] = { submitted: submittedList, missing: missingList };
+        });
+        teamStatus[team] = { members: memberList, weekStatus };
+      }
+
+      return { weeks, teamStatus };
+    }
+
+    function render(teams, submissionStatus) {
       const sorted = [...teams].sort((a, b) => b.total - a.total);
       const maxScore = sorted[0]?.total || 1;
       const top = sorted[0];
@@ -528,7 +762,7 @@
 
         html += `
           <div class="bar-row">
-            <div class="bar-rank ${rankClass}">${i + 1}</div>
+            <div class="bar-rank ${rankClass}">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</div>
             <div class="bar-label" style="color: ${barColor}">${t.team}팀</div>
             <div class="bar-track">
               <div class="bar-fill ${isNarrow ? 'narrow' : ''}" style="width: ${Math.max(pct, 3)}%; background: ${barColor};">
@@ -545,13 +779,16 @@
         <div class="table-section">
           <h2>상세 순위</h2>
           <table class="rank-table"><thead><tr>
-            <th>순위</th><th>팀</th><th>팀원</th><th>개인 점수</th><th>보너스</th><th>총점</th>
+            <th>순위</th><th>팀</th><th>팀원</th><th>개인 점수</th><th>전체 제출 보너스</th><th>피드백 보너스</th><th>총점</th>
           </tr></thead><tbody>`;
 
       sorted.forEach((t, i) => {
         const dotColor = getRankColor(i, teamCount);
         const bonusBadges = t.bonusTotal > 0
           ? `${Math.round(t.bonusTotal).toLocaleString()} <span class="bonus-badge">+${t.bonusTotal / 100}회</span>`
+          : '0';
+        const fbDisplay = t.fbBonus > 0
+          ? `${t.fbBonus} <span class="bonus-badge" style="background:#fff3e0;color:#e65100">💬</span>`
           : '0';
         html += `
           <tr>
@@ -562,6 +799,7 @@
             <td>${t.members}명</td>
             <td>${Math.round(t.personalTotal).toLocaleString()}</td>
             <td class="bonus-cell">${bonusBadges}</td>
+            <td class="bonus-cell">${fbDisplay}</td>
             <td class="score-cell" style="color: ${dotColor}">${Math.round(t.total).toLocaleString()}</td>
           </tr>`;
       });
@@ -580,11 +818,12 @@
           <div class="table-section">
             <h2>주차별 제출 현황</h2>
             <table class="rank-table"><thead><tr>
-              <th>팀</th>${weeks.map(w => `<th>${w.label}</th>`).join('')}
+              <th>팀</th>${weeks.map(w => `<th style="text-align:right">${w.label}</th>`).join('')}
             </tr></thead><tbody>`;
 
-        sorted.forEach((t, i) => {
-          const dotColor = getRankColor(i, teamCount);
+        [...sorted].sort((a, b) => a.team.localeCompare(b.team)).forEach((t) => {
+          const rankIdx = sorted.indexOf(t);
+          const dotColor = getRankColor(rankIdx, teamCount);
           html += `
             <tr>
               <td class="team-cell">
@@ -601,6 +840,8 @@
         html += `</tbody></table></div>`;
       }
 
+      // 개인별 제출 현황 — 추후 구현 예정
+
       app.innerHTML = html;
 
       // 바 애니메이션
@@ -612,9 +853,39 @@
         });
       });
 
+      // 개인별 현황 이벤트 바인딩
+      bindPersonalStatusEvents();
+
       const now = new Date();
       document.getElementById('updateInfo').textContent =
         `마지막 업데이트: ${now.toLocaleDateString('ko-KR')} ${now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
+    function bindPersonalStatusEvents() {
+      // 주차 탭 클릭
+      document.querySelectorAll('.week-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const week = tab.dataset.week;
+          document.querySelectorAll('.week-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          document.querySelectorAll('.week-content').forEach(c => {
+            c.style.display = c.dataset.weekContent === week ? '' : 'none';
+          });
+        });
+      });
+
+      // 아코디언 토글
+      document.querySelectorAll('.team-accordion-header').forEach(header => {
+        header.addEventListener('click', () => {
+          const key = header.dataset.accordion;
+          const body = document.querySelector(`[data-accordion-body="${key}"]`);
+          const arrow = header.querySelector('.arrow');
+          if (body) {
+            const isOpen = body.classList.toggle('open');
+            arrow.classList.toggle('open', isOpen);
+          }
+        });
+      });
     }
 
     function showError(msg) {
@@ -624,12 +895,36 @@
 
     async function loadData() {
       try {
-        const res = await fetch(CSV_URL);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const text = await res.text();
-        const teams = parseCSV(text);
+        const [scoreRes, memberRes, submitRes] = await Promise.all([
+          fetch(CSV_URL),
+          fetch(MEMBER_CSV_URL).catch(() => null),
+          fetch(SUBMIT_CSV_URL).catch(() => null),
+        ]);
+
+        if (!scoreRes.ok) throw new Error(`HTTP ${scoreRes.status}`);
+        const scoreText = await scoreRes.text();
+        const teams = parseCSV(scoreText);
         if (teams.length === 0) throw new Error('데이터가 비어 있습니다');
-        render(teams);
+
+        // 소그룹/과제 폼은 실패해도 기존 대시보드 유지
+        let submissionStatus = null;
+        if (memberRes?.ok && submitRes?.ok) {
+          try {
+            const [memberText, submitText] = await Promise.all([
+              memberRes.text(),
+              submitRes.text(),
+            ]);
+            const members = parseMemberCSV(memberText);
+            const submissions = parseSubmitCSV(submitText);
+            if (members.length > 0 && submissions.length > 0) {
+              submissionStatus = buildSubmissionStatus(members, submissions);
+            }
+          } catch (e) {
+            console.warn('개인별 현황 파싱 실패:', e);
+          }
+        }
+
+        render(teams, submissionStatus);
       } catch (err) {
         console.error('데이터 로드 실패:', err);
         showError('스프레드시트의 "웹에 게시" 설정을 확인해주세요.');
