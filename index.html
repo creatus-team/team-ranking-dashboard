@@ -653,11 +653,11 @@
           w3: parseInt(cells[4]) || 0,
           personalTotal: parseFloat(cells[5]) || 0,
           bonusTotal: parseInt(cells[6]) || 0,
-          total: parseFloat(cells[7]) || 0,
-          fb1: cells[8] === 'TRUE' ? 1 : 0,
-          fb2: cells[9] === 'TRUE' ? 1 : 0,
-          fb3: cells[10] === 'TRUE' ? 1 : 0,
-          fbBonus: parseInt(cells[11]) || 0,
+          fb1: cells[7] === 'TRUE' ? 1 : 0,
+          fb2: cells[8] === 'TRUE' ? 1 : 0,
+          fb3: cells[9] === 'TRUE' ? 1 : 0,
+          fbBonus: parseInt(cells[10]) || 0,
+          total: parseFloat(cells[11]) || 0,
         };
       }).filter(row => row.team && row.members > 0);
     }
